@@ -2,11 +2,15 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const morgan = require("morgan")
 dotenv.config();
 
 const authRoutes = require("./routes/auth");
-
+const userRoutes = require("./routes/users");
+const movieRoutes = require("./routes/movies");
+app.use(morgan('combined'))
 app.use(express.json());
+
 mongoose.connect(process.env.MONGO_URL,{
   useNewUrlParser:true
 }).then(()=>{
@@ -14,8 +18,10 @@ mongoose.connect(process.env.MONGO_URL,{
 }).catch((error)=>{
   console.log(error)
 })
-app.use("/api/auth",authRoutes)
 
+app.use("/api/auth",authRoutes)
+app.use("/api/users",userRoutes)
+app.use("/api/movies",movieRoutes)
 
 app.listen(8800,()=>{
   console.log("Backend server is running!")

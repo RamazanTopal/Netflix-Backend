@@ -4,17 +4,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 //REGISTER
 router.post("/register",async (req,res)=>{
+  let salt = bcrypt.genSaltSync(10)                                                                                                                                     
+  const hashPassword  = bcrypt.hashSync(req.body.password, salt)  
   const newUser = new User({
     username:req.body.username,
     email:req.body.email,
-    password:req.body.password
+    password:hashPassword
   });
-  console.log("newUser",newUser);
   try{
   const user = await newUser.save();
   res.status(201).json(user)
   }catch(err){
-    res.status(500).json(err);
+    res.status(500).json("You can't registered");
   }
 })
 
@@ -23,6 +24,7 @@ router.post("/login",async (req,res)=>{
   try{
   const {email,password}=req.body;
   const user = await User.findOne({email:email})
+  console.log("USER",user)
   if(!user){
     throw new Error("User is not exist");
   }
@@ -34,7 +36,7 @@ router.post("/login",async (req,res)=>{
     throw new Error("Wrong username or password.");
   }
   }catch(err){
-    res.status(500).json(err);
+    res.status(500).json("Login is not successful");
   }
 })
 module.exports = router;
